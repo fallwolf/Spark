@@ -1,0 +1,36 @@
+from PIL import Image, ImageDraw
+from numpy import genfromtxt
+import numpy as np
+from pandas import DataFrame
+
+g = open('D:\\test.csv','r')
+temp = genfromtxt(g, delimiter = ',')
+norm=np.empty(shape=(256,320))
+t_rever=np.empty(shape=(256,320))
+t_enhence=np.empty(shape=(256,320))
+amax=np.max(temp)
+amin=np.min(temp)
+print(amax, amin)
+for x in range(temp.shape[0]):
+    for y in range(temp.shape[1]):
+        norm[x,y]=int(temp[x,y]/amax*255)#常规保存
+        t_rever[x,y]=255-norm[x,y]#灰度翻转
+        t_enhence[x,y]=255*(temp[x,y]-amin)/(amax-amin)#对比度拉伸
+#常规图像及数据保存
+im = Image.fromarray(norm)
+pix = im.convert("L")
+pix.save('D:\\norm.jpeg')
+df = DataFrame(temp)
+df.to_excel('d:\\norm.xlsx', sheet_name='sheet1', index=False)
+#灰度翻转的图像及数据保存
+im_rever=Image.fromarray(t_rever)
+pix_rever = im_rever.convert("L")
+pix_rever.save('D:\\rever.jpeg')
+df2 = DataFrame(t_rever)
+df2.to_excel('d:\\rever.xlsx', sheet_name='sheet1', index=False)
+#对比度拉伸的图像及数据保存
+im_enhence = Image.fromarray(t_enhence)
+pix_enhence = im_enhence.convert("L")
+pix_enhence.save('D:\\a_enhence.jpeg')
+df3 = DataFrame(t_enhence)
+df3.to_excel('d:\\a_enhence.xlsx', sheet_name='sheet1', index=False)
